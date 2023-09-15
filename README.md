@@ -1,2 +1,2 @@
 # utah-machine-learning
-CS6350 Machine Learning Coursework in University of Utah
+This is a machine learning library developed by Sizhe(Jasmine) Chen for CS6350 in University of Utah
