@@ -1,0 +1,15 @@
+*.zip
+*.§â§å§ã
+*.log 
+metastore_db
+derby.log
+target
+wf1-poc*
+*.png
+mlruns
+lr-model
+.cache
+.vscode
+.idea
+venv/**
+venv.tar.gz
