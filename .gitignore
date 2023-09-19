@@ -1,5 +1,5 @@
 *.zip
-*.§â§å§ã
+*.ï¿½ï¿½ï¿½ï¿½
 *.log 
 metastore_db
 derby.log
@@ -13,3 +13,4 @@ lr-model
 .idea
 venv/**
 venv.tar.gz
+.DS_Store
