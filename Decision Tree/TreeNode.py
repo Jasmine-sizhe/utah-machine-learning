@@ -9,3 +9,12 @@ class TreeNode:
 
     def add_child(self, child_node):
         self.children.append(child_node)
+
+
+    # def __str__(self, level=0):
+    #     prefix = "  " * level
+    #     result = prefix + f"Attribute: {self.attributes}, Label: {self.value}\n"
+    #     for child in self.children:
+    #         result += prefix + f"Child:\n"
+    #         result += child.__str__(level + 1)
+    #     return result
