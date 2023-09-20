@@ -3,37 +3,18 @@ import numpy as np
 import math
 import TreeNode
 
-class TreeNode:
-    def __init__(self, label=None, attributes=None, children=None):
-        self.value = label  # value of the node
-        self.attributes = attributes if attributes is not None else {}  # attributes in dict
-        self.children = children or {}  # dict of child nodes
-    
-    # def __str__(self):
-        # return str(self.value)
-
-    def add_child(self, child_node):
-        self.children.append(child_node)
-
-
-    def __str__(self, level=0):
-        prefix = "  " * level
-        result = prefix + f"Attribute: {self.attributes}, Label: {self.value}\n"
-        for child in self.children:
-            result += prefix + f"Child:\n"
-            result += child.__str__(level + 1)
-        return result
-
 def calculate_entropy(feature_value_data, class_list):
     """Function to calculate entropy"""
     # feature_value_data: Subdataset with feature value data
     # class_list: the unique class list in target variable
     feature_total_count = feature_value_data.shape[0]
     label_list = feature_value_data.iloc[:, -1].tolist()
+    print("feature_total_count: ", feature_total_count)
     entropy = 0
     
     for class_label in class_list:
         class_count = label_list.count(class_label)
+        print("class_count: ", class_count)
         class_probability = class_count / feature_total_count
         if class_probability > 0:
             class_entropy = -class_probability * math.log2(class_probability)
@@ -71,14 +52,18 @@ def calculate_info_gain(feature_name, data, class_list, purity_measurement):
     # purity_measurement should be one of entropy, majority_error, gini
     print("starting calculating {} information gain".format(feature_name))
     feature_value_list = data[feature_name].unique()
+    print("feature_value_list: ",feature_value_list )
     total_row = data.shape[0]
+    print("total_row: ", total_row)
     feature_info = 0.0
     
     for feature_value in feature_value_list:
         print("starting feature_value={} in the list".format(feature_value))
         feature_value_data = data[data[feature_name] == feature_value] #filtering rows with that feature_value
+        print("feature_value_data: ", feature_value_data)
         feature_value_count = feature_value_data.shape[0]
         if purity_measurement == 'entropy':
+            print("starting calcualting using entropy")
             total_entropy = calculate_entropy(data, class_list)
             feature_value_entropy = calculate_entropy(feature_value_data, class_list) #calculcating entropy for the feature value
             feature_value_probability = feature_value_count/total_row
@@ -95,27 +80,46 @@ def calculate_info_gain(feature_name, data, class_list, purity_measurement):
             feature_value_probability = feature_value_count/total_row
             feature_info += feature_value_probability * feature_value_entropy #calculating information of the feature value
         else: 
-            print("No valid purity_measurement has been input. We only support entropy, majority_error and gini. Please further check! ")
-            raise ValueError
+            print("No valid purity_measurement has been input. Please further check! ")
     return total_entropy - feature_info
 
 
 def find_most_informative_feature(data, class_list, purity_measurement):
     print("starting finding the most informative feature")
+    print("data:",data)
     # Get the feature columns (all columns except the label column)
     feature_list = data.columns[:-1].tolist()
+    print("feature_list: ", feature_list)
     max_info_gain = -1
     max_info_feature = None
-
+    print("class_list: ", class_list)
+    
     for feature in feature_list:  #for each feature in the dataset
+        print("starting calculating feaure gain")
         feature_info_gain = calculate_info_gain(feature, data, class_list, purity_measurement)
-        print("For {} the information gain is {}".format(feature, feature_info_gain))
         if max_info_gain < feature_info_gain: #selecting feature name with highest information gain
             max_info_gain = feature_info_gain
             max_info_feature = feature
-    print("max info feature: ", max_info_feature)
+        print("max info feature: ", max_info_feature)
             
     return max_info_feature
+
+# def choose_best_attribute(S, Attributes, Label, class_list, purity_measurement='IG'):
+#     print("starting choosing best attribute...")
+#     print("class_list: ", class_list)
+#     if purity_measurement == 'IG':
+#         print("starting use purity measurement as Information Gain")
+#         # Calculate information gain for all attributes and return the one with the maximum IG
+#         best_attribute = find_most_informative_feature(S, Label, class_list)
+#     # elif purity_measurement == 'majority':
+#     #     best_attribute = max(Attributes, key=lambda attr: calculate_me_gain(S, attr, Label))
+#     # elif purity_measurement == 'gini':
+#     #     best_attribute = max(Attributes, key=lambda attr: calculate_gini_gain(S, attr, Label))
+#     # else:
+#     #     print("Invalid purity measurement input. Only 'IG', 'majority', and 'gini' are supported. Defaulting to Information Gain.")
+#     #     best_attribute = max(Attributes, key=lambda attr: calculate_information_gain(S, attr, Label))
+
+#     return best_attribute
 
 # Find most common label
 def find_most_common_label(labels):
@@ -146,6 +150,9 @@ def ID3(S, Attributes, Label, purity_measurement=None):
     # Check if leaf mode with the same label
     unique_labels = set(Label)
     class_list = list(unique_labels)
+    print("unique_labels: ", unique_labels)
+    print("length of unique labels: ", len(unique_labels))
+    print("class_list: ", class_list)
     if len(unique_labels) == 1:
         print('unique labels == 1')
         return TreeNode(label=unique_labels.pop())
@@ -159,8 +166,9 @@ def ID3(S, Attributes, Label, purity_measurement=None):
         root = TreeNode()
         print("starting create root node")
         # Choose the best attribute A to split S
-        # find_most_informative_feature(data, class_list, purity_measurement):
-        best_attribute = find_most_informative_feature(S, class_list, purity_measurement)
+        # Support the input purity measurement of IG, majorty and gini. Here we set default is IG.
+       #find_most_informative_feature(data, label, class_list, purity_measurement):
+        best_attribute = find_most_informative_feature(S, class_list,purity_measurement)
         print("best attribute: ", best_attribute)
         root.attributes = best_attribute
 
