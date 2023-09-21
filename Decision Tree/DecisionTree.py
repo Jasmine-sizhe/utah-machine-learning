@@ -100,7 +100,7 @@ def calculate_info_gain(feature_name, data, class_list, purity_measurement):
     return total_entropy - feature_info
 
 
-def find_most_informative_feature(data, class_list, purity_measurement):
+def find_best_attribute(data, class_list, purity_measurement):
     print("starting finding the most informative feature")
     # Get the feature columns (all columns except the label column)
     feature_list = data.columns[:-1].tolist()
@@ -160,7 +160,7 @@ def ID3(S, Attributes, Label, purity_measurement=None):
         print("starting create root node")
         # Choose the best attribute A to split S
         # find_most_informative_feature(data, class_list, purity_measurement):
-        best_attribute = find_most_informative_feature(S, class_list, purity_measurement)
+        best_attribute = find_best_attribute(S, class_list, purity_measurement)
         print("best attribute: ", best_attribute)
         root.attributes = best_attribute
 
