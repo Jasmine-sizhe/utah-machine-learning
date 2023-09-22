@@ -1,5 +1,4 @@
 *.zip
-*.����
 *.log 
 metastore_db
 derby.log
@@ -14,4 +13,4 @@ lr-model
 venv/**
 venv.tar.gz
 .DS_Store
-.__pycache__/
+__pycache__/

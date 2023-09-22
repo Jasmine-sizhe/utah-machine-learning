@@ -1,7 +1,7 @@
 import pandas as pd
 import numpy as np
 import math
-import TreeNode
+from TreeNode import TreeNode
 
 def calculate_entropy(feature_value_data, class_list):
     """Function to calculate entropy"""

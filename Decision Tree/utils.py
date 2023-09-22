@@ -1,4 +1,5 @@
 import pandas as pd
+import numpy as np
 def predict(tree, df_test):
     """
     tree: The tree that has been build from ID3
