@@ -3,86 +3,6 @@ import numpy as np
 import math
 import TreeNode
 
-class TreeNode: 
-    def __init__(self, label=None, attributes=None, children=None):
-        self.label = label  # value of the node
-        self.attributes = attributes
-        self.children = children or []  # dict of child nodes
-    
-    def __str__(self, level=0):
-        prefix = "  " * level
-        result = prefix + f"Attribute: {self.attributes}, Label: {self.label}\n"
-        for child in self.children:
-            result += prefix + f"Child:\n"
-            result += child.__str__(level + 1)
-        return result
-    # def __str__(self):
-    #     return str(self.value)
-
-    def add_child(self, child_node):
-        self.children.append(child_node)
-        
-def ID3(S, Attributes, max_depth, purity_measurement=None, root=None):
-    if not purity_measurement:
-        purity_measurement = 'entropy'  # Default purity measurement
-    # Check if leaf mode with the same label
-    Label = S.iloc[:,-1].tolist()
-    unique_labels = set(Label)
-    class_list = list(unique_labels)  
-    if len(unique_labels) == 1:
-        get_unique_label = next(iter(unique_labels))
-        if root is None:
-            return TreeNode(label=get_unique_label)
-        else:
-            root.label = get_unique_label
-            return root
-    
-    # Check if attribute is empty
-    elif not Attributes or max_depth==0:
-        most_common_label = find_most_common_label(S)
-        if root is None:
-            return TreeNode(label=most_common_label)
-        else:
-            root.label = most_common_label
-            return root
-    
-    else:
-        if root is None:
-            root = TreeNode()
-            print("------Root is none, first time creating root node-------")
-        print("------starting creating root node-------")
-        # Choose the best attribute A to split S
-        print("check current root:", root)
-        best_attribute = find_best_attribute(S, Attributes, class_list, purity_measurement)
-        print("best attribute: ", best_attribute)
-        root.attributes = best_attribute 
-        
-        # Create a new list for remaining attributes
-        remaining_attributes = [attr for attr in Attributes if attr != best_attribute]
-        print("remaining_attributes: ", remaining_attributes)  
-        # Deal with the remaining attributes for subset Sv, according to A=V
-        attribute_values = S[best_attribute].unique().tolist()
-        
-        for value in attribute_values:
-            print("value in attribute values:", value)
-            child_node = TreeNode()
-            child_node.attributes = value  
-            root.add_child(child_node) 
-            print("Check current root: ", root)
-
-            Sv = S[S[best_attribute] == value]
-            
-            # If Sv is empty, add leaf node with the most common value of label in S
-            if Sv.empty:
-                most_common_label = find_most_common_label(Sv)
-                child_node.label = most_common_label              
-                print("check child node: ", child_node)
-            else:
-                print("starting create sub tree")
-                ID3(Sv, remaining_attributes, max_depth-1, purity_measurement, root=child_node)
-    return root
-
-
 def calculate_entropy(feature_value_data, class_list):
     """Function to calculate entropy"""
     # feature_value_data: Subdataset with feature value data
@@ -120,7 +40,7 @@ def calculate_gini_index(feature_value_data, class_list):
     for class_label in class_list:
         class_count = label_list.count(class_label)
         class_probability = class_count / feature_total_count
-        gini_index += class_probability * (1 - class_probability)
+        gini_index += 1 - class_probability**2
     
     return gini_index
 
@@ -158,17 +78,12 @@ def calculate_info_gain(feature_name, data, class_list, purity_measurement):
 
 
 def find_best_attribute(data, attributes, class_list, purity_measurement):
-    print("starting finding the best feature")
     # Get the feature columns (all columns except the label column)
-    print("data count for input df: ", data.shape[0])
-    feature_list = data.columns[:-1].tolist()
-    print("feature list in find best_attribute", feature_list)
     max_info_gain = -1
     max_info_feature = None
 
     for attribute in attributes:  #for each feature in the dataset
         feature_info_gain = calculate_info_gain(attribute, data, class_list, purity_measurement)
-        print("For {} the information gain is {}".format(attribute, feature_info_gain))
         if max_info_gain < feature_info_gain: #selecting feature name with highest information gain
             max_info_gain = feature_info_gain
             max_info_feature = attribute
@@ -190,3 +105,66 @@ def count_elements(lst):
         else:
             element_counts[element] = 1
     return element_counts
+
+# ID3 Algorithm implementation        
+def ID3(S, Attributes, max_depth, purity_measurement=None, root=None):
+    """
+    S: Dataframe
+    Attributes: list of all attributes in the dataframe
+    max_depth: int
+    purity_measurement: "entropy", "majority_error", "gini"
+    """
+    if not purity_measurement:
+        purity_measurement = 'entropy'  # Default purity measurement
+    # Check if leaf mode with the same label
+    Label = S.iloc[:,-1].tolist()
+    unique_labels = set(Label)
+    class_list = list(unique_labels)  
+    if len(unique_labels) == 1:
+        get_unique_label = next(iter(unique_labels))
+        if root is None:
+            return TreeNode(label=get_unique_label)
+        else:
+            root.label = get_unique_label
+            return root
+    
+    # Check if attribute is empty
+    elif not Attributes or max_depth==0:
+        most_common_label = find_most_common_label(S)
+        if root is None:
+            return TreeNode(label=most_common_label)
+        else:
+            root.label = most_common_label
+            return root
+    
+    else:
+        if root is None:
+            root = TreeNode()
+        # Choose the best attribute A to split S
+        best_attribute = find_best_attribute(S, Attributes, class_list, purity_measurement)
+        if root.attributes == None:
+            next_node = root
+            next_node.attributes = best_attribute
+        else:
+            next_node = TreeNode()
+            next_node.attributes = best_attribute
+            root.add_child(next_node)
+        
+        # Create a new list for remaining attributes
+        remaining_attributes = [attr for attr in Attributes if attr != best_attribute]
+        # Deal with the remaining attributes for subset Sv, according to A=V
+        attribute_values = S[best_attribute].unique().tolist()
+        
+        for value in attribute_values:
+            child_node = TreeNode()
+            child_node.attributes = value  
+            next_node.add_child(child_node) 
+            Sv = S[S[best_attribute] == value]
+            
+            # If Sv is empty, add leaf node with the most common value of label in S
+            if Sv.empty:
+                most_common_label = find_most_common_label(Sv)
+                child_node.label = most_common_label
+            else:
+                ID3(Sv, remaining_attributes, max_depth-1, purity_measurement, root=child_node)
+    return root
