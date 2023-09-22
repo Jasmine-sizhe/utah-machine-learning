@@ -16,25 +16,20 @@ class TreeNode:
             result += prefix + f"Child:\n"
             result += child.__str__(level + 1)
         return result
+    # def __str__(self):
+    #     return str(self.value)
 
     def add_child(self, child_node):
         self.children.append(child_node)
         
-def ID3(S, Attributes, max_depth=None, purity_measurement=None, root=None):
+def ID3(S, Attributes, max_depth, purity_measurement=None, root=None):
     if not purity_measurement:
         purity_measurement = 'entropy'  # Default purity measurement
-    print('Starting implementing ID3 with purity_measurement {}'.format(purity_measurement))
-
     # Check if leaf mode with the same label
     Label = S.iloc[:,-1].tolist()
     unique_labels = set(Label)
-    class_list = list(unique_labels)
-    
-
-    print("class list in this iteration", class_list)
-    
+    class_list = list(unique_labels)  
     if len(unique_labels) == 1:
-        print('unique labels == 1')
         get_unique_label = next(iter(unique_labels))
         if root is None:
             return TreeNode(label=get_unique_label)
@@ -43,9 +38,8 @@ def ID3(S, Attributes, max_depth=None, purity_measurement=None, root=None):
             return root
     
     # Check if attribute is empty
-    elif not Attributes:
+    elif not Attributes or max_depth==0:
         most_common_label = find_most_common_label(S)
-        print("attribute is empty, find most common label: ", most_common_label)
         if root is None:
             return TreeNode(label=most_common_label)
         else:
@@ -58,14 +52,14 @@ def ID3(S, Attributes, max_depth=None, purity_measurement=None, root=None):
             print("------Root is none, first time creating root node-------")
         print("------starting creating root node-------")
         # Choose the best attribute A to split S
+        print("check current root:", root)
         best_attribute = find_best_attribute(S, Attributes, class_list, purity_measurement)
         print("best attribute: ", best_attribute)
         root.attributes = best_attribute 
         
         # Create a new list for remaining attributes
         remaining_attributes = [attr for attr in Attributes if attr != best_attribute]
-        print("remaining_attributes: ", remaining_attributes)
-        
+        print("remaining_attributes: ", remaining_attributes)  
         # Deal with the remaining attributes for subset Sv, according to A=V
         attribute_values = S[best_attribute].unique().tolist()
         
@@ -77,15 +71,15 @@ def ID3(S, Attributes, max_depth=None, purity_measurement=None, root=None):
             print("Check current root: ", root)
 
             Sv = S[S[best_attribute] == value]
-            # remaining_label = Sv.iloc[:,-1].tolist()
             
             # If Sv is empty, add leaf node with the most common value of label in S
             if Sv.empty:
                 most_common_label = find_most_common_label(Sv)
-                child_node.label = most_common_label
-                print("return root when Sv is empty",root)
+                child_node.label = most_common_label              
+                print("check child node: ", child_node)
             else:
-                ID3(Sv, remaining_attributes, max_depth, purity_measurement, root=child_node)
+                print("starting create sub tree")
+                ID3(Sv, remaining_attributes, max_depth-1, purity_measurement, root=child_node)
     return root
 
 

@@ -1,6 +1,13 @@
 import pandas as pd
 
 
+#TODO run ID3 for bank dataset
+def test_bank_dataset():
+    return
+
+#TODO run ID3 for car dataset
+def test_car_dataset():
+    return
 
 
 if __name__ == "__main__":
@@ -22,5 +29,5 @@ if __name__ == "__main__":
         if dataset=='b':
             test_bank_dataset(maxDepth,int(split))
         else:
-            Ttest_car_dataset(maxDepth,int(split))
+            test_car_dataset(maxDepth,int(split))
         print('\n')
