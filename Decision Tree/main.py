@@ -1,4 +1,5 @@
 import pandas as pd
+import numpy as np
 from DecisionTree import ID3
 from utils import predict, calculate_error_rate, preprocess_numerical_columns
 
@@ -72,7 +73,7 @@ if __name__ == "__main__":
             print("Sorry, unrecognized split\n")
             purity_method = input('purity method? entropy, majority_error, gini?\n')
         if dataset=='b':
-            test_bank_dataset(max_depth,int(purity_method))
+            test_bank_dataset(max_depth, purity_method)
         else:
-            test_car_dataset(max_depth,int(purity_method))
+            test_car_dataset(max_depth, purity_method)
         print('\n')
