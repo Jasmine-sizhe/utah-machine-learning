@@ -66,3 +66,19 @@ def preprocess_numerical_columns(df, numerical_columns):
         df_processed[column] = df_processed[column].cat.add_categories("unknown").fillna("unknown")
 
     return df_processed
+
+# Data processing with unknown value in the datasets (Bank dataset)
+# If imputation needed, need to call this function before feed into the ID3 algorithm
+def fill_unknown(df):
+    """
+    Input is dataframe, return is also a dataframe with filed unknown dataset
+    example: df_filled_train = fill_unknown(df_all_categorical_bank_train)
+    Then use df_filled_train feed into ID3
+    """
+    df_res = df.copy()
+    for col in df_res.columns:
+        unique, pos = np.unique(df_res[col], return_inverse=True)  
+        counts = np.bincount(pos) 
+        maxpos = counts.argmax()  
+        df_res[col] = np.where(df_res[col] == "unknown", unique[maxpos], df[col]) 
+    return df_res
