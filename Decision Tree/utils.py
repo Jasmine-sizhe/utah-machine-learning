@@ -67,7 +67,7 @@ def preprocess_numerical_columns(df, numerical_columns):
 
     return df_processed
 
-# Data processing with unknown value in the datasets
+# Data processing with unknown value in the datasets (Bank dataset)
 # If imputation needed, need to call this function before feed into the ID3 algorithm
 def fill_unknown(df):
     """
