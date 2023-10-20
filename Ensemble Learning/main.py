@@ -2,6 +2,7 @@ import matplotlib.pyplot as plt
 from BaggedTree import BaggedTrees, calculate_error_rate
 import pandas as pd
 from RandomForest import RandomForest
+from sklearn.model_selection import train_test_split
 
 # Loading and preprocessing data
 def preprocess_data(df):
@@ -31,20 +32,51 @@ def load_bank_data():
 
     return train_data, test_data, attributes
 
+def load_credit_card_data():
+    file_path="Data/credit-card/credit_card.xls"
+    df = pd.read_excel(file_path, header=1)
+
+    # Deal with numeric value except target variable
+    for column in df.columns[:-1]:
+        if df[column].dtype == 'int64':
+            median_value = df[column].median()
+            df[column] = (df[column] >= median_value).astype(int)
+
+    train_data, test_data = train_test_split(df, train_size=24000, test_size=6000, random_state=42)
+    attributes = train_data.columns.tolist()[:-1]
+
+    return train_data, test_data, attributes
+
 # Model training 
-def train_Adaboost():
-    train_data, test_data, attributes = load_bank_data()
+def train_Adaboost(dataset_alias):
+    print("-----starting loading data for adaboost-------")
+    if dataset_alias == 'b':
+        train_data, test_data, attributes = load_bank_data()
+    elif dataset_alias == 'c':
+        train_data, test_data, attributes = load_credit_card_data()
+    else:
+        print("Unrecognized dataset alias!")
+        return None
+    print("-----starting training for adaboost-------")
     training_errors = []
     testing_errors = []
 
     return "A"
 
 
-def train_Bagging():
-    train_data, test_data, attributes = load_bank_data()
+def train_Bagging(dataset_alias):
+    print("-----starting loading data for bagging-------")
+    if dataset_alias == 'b':
+        train_data, test_data, attributes = load_bank_data()
+    elif dataset_alias == 'c':
+        train_data, test_data, attributes = load_credit_card_data()
+    else:
+        print("Unrecognized dataset alias!")
+        return None
     training_errors = []
     testing_errors = []
 
+    print("-----starting training for bagging-------")
     for n in range(1, 11):  # Looping n from 1 to 10
         bagged_model = BaggedTrees(n_trees=n)
         bagged_model.fit(train_data, attributes)
@@ -73,16 +105,23 @@ def train_Bagging():
     plt.xticks(range(1, 11))
     plt.show()
 
-import matplotlib.pyplot as plt
-
-def train_RandomForest():
-    train_data, test_data, attributes = load_bank_data()
+def train_RandomForest(dataset_alias):
+    print("-----starting loading data for random forest-------")
+    if dataset_alias == 'b':
+        train_data, test_data, attributes = load_bank_data()
+    elif dataset_alias == 'c':
+        train_data, test_data, attributes = load_credit_card_data()
+    else:
+        print("Unrecognized dataset alias!")
+        return None
+    
     # Lists to store results
     trees_range = list(range(1, 11))
     feature_subsets = [2, 4, 6]
     results_train = {}
     results_test = {}
 
+    print("-----starting training for random forest-------")
     for feature_subset in feature_subsets:
         error_rates_train = []
         error_rates_test = []
@@ -130,11 +169,12 @@ if __name__ == "__main__":
             dataset = input('Dataset? b for Bank Dataset, c for Credit-card dataset\n')
         if dataset =='e':
             exit(0)
-        ensemble_method = input('Ensemble method? a for Adabooost, b for Bagging, r for Random Forest\n')
-        if ensemble_method=='a':
-            train_Adaboost()
-        if ensemble_method=='b':
-            train_Bagging()
+        if dataset=='b':
+            # train_Adaboost('b')
+            train_Bagging('b')
+            # train_RandomForest('b')
         else:
-            train_RandomForest()
+            train_Adaboost('c')
+            train_Bagging('c')
+            train_RandomForest('c')
         print('\n')

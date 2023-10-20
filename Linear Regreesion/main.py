@@ -47,6 +47,8 @@ if __name__ == "__main__":
         while optimization_method != 'bgd' and optimization_method != 'sgd':
             print("Sorry, unrecogonized optimization method\n")
             optimization_method = input('Optimization Method? bgd for Batch Gradient Descent, sgd for Stochastic Gradient Descent, e for exit\n')
+        if optimization_method =='e':
+            exit(0)
         if optimization_method=='bgd':
             test_concrete_bgd()
         else:
