@@ -41,16 +41,6 @@ class RandomForest:
         for _ in range(self.n_trees):
             # Sample with replacement from data
             bootstrap_sample = data.sample(n=len(data), replace=True)
-            #def ID3(S, Attributes, max_depth, feature_subset_size=None, purity_measurement=None, root=None):
-
-            # Train a decision tree on this sample with feature subsetting
-            # print(attributes)
-            # print(type(attributes))
-            # print(self.feature_subset_size)
-            # print(type(self.feature_subset_size))
-            # print([type(attribute) for attribute in attributes])
-
-
             tree = ID3(S=bootstrap_sample, Attributes=attributes, max_depth = float('inf'),feature_subset_size= self.feature_subset_size, purity_measurement="entropy")
             self.trees.append(tree)
 

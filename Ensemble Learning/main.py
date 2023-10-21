@@ -1,8 +1,9 @@
 import matplotlib.pyplot as plt
-from BaggedTree import BaggedTrees, calculate_error_rate
+from BaggedTree import BaggedTrees, calculate_error_rate, run_bagged_trees_experiment
 import pandas as pd
 from RandomForest import RandomForest
 from sklearn.model_selection import train_test_split
+from Adaboost import adaboost, adaboost_predict
 
 # Loading and preprocessing data
 def preprocess_data(df):
@@ -58,10 +59,33 @@ def train_Adaboost(dataset_alias):
         print("Unrecognized dataset alias!")
         return None
     print("-----starting training for adaboost-------")
-    training_errors = []
-    testing_errors = []
+    train_errors = []
+    test_errors = []
+    T_values = list(range(1, 11))
 
-    return "A"
+    for T in T_values:
+        weak_classifiers, alphas = adaboost(train_data, attributes, T)
+
+        train_predictions = [adaboost_predict(row[1], weak_classifiers, alphas) for row in train_data.iterrows()]
+        mismatches_train = sum([pred != actual for pred, actual in zip(train_predictions, train_data["y"].tolist())])
+        train_error = mismatches_train / len(train_data)
+        train_errors.append(train_error)
+
+        test_predictions = [adaboost_predict(row[1], weak_classifiers, alphas) for row in test_data.iterrows()]
+        mismatches_test = sum([pred != actual for pred, actual in zip(test_predictions, test_data["y"].tolist())])
+        test_error = mismatches_test / len(test_data)
+        test_errors.append(test_error)
+
+    plt.figure(figsize=(10,6))
+    plt.plot(T_values, train_errors, label="Train Error", marker='o')
+    plt.plot(T_values, test_errors, label="Test Error", marker='o')
+    plt.xlabel("Number of Iterations (T)")
+    plt.ylabel("Error")
+    plt.title("Training and Test Errors as T varies")
+    plt.legend()
+    plt.grid(True)
+    plt.show()
+
 
 
 def train_Bagging(dataset_alias):
@@ -104,6 +128,9 @@ def train_Bagging(dataset_alias):
     plt.grid(True)
     plt.xticks(range(1, 11))
     plt.show()
+    # Run bagged tree
+    print("-------run bagged trees experiment---------")
+    run_bagged_trees_experiment(train_data, test_data, attributes)
 
 def train_RandomForest(dataset_alias):
     print("-----starting loading data for random forest-------")
@@ -170,9 +197,9 @@ if __name__ == "__main__":
         if dataset =='e':
             exit(0)
         if dataset=='b':
-            # train_Adaboost('b')
-            train_Bagging('b')
-            # train_RandomForest('b')
+            train_Adaboost('b')
+            train_Bagging('b')       
+            train_RandomForest('b')
         else:
             train_Adaboost('c')
             train_Bagging('c')
