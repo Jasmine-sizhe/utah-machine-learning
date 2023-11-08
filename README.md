@@ -14,3 +14,7 @@ Due to computation limiation, I hardcode the iteration from (1,11) for training 
 excute the code with run.sh, (if not working please just try 'python main.py', then the code will excecute)
 This time you need to select which optimization method you would like to try, then it will automatically run with that method and display figure.
 In addition, you could also refer to linear_output.ipynb for the output figure under 'Linear Regression' folder if do not have enough time to run.
+
+4. For Perception:
+excute the code with run.sh, (if not working please just try 'python main.py', then the code will excecute)
+This time you need to select which percetron algorithm you would like to try. After exeuction, it will prompt you input 'Algorithm? 0 for Standard, 1 for Voted, 2 for Average', then just input 0 or 1 or 2 for algorithm specification. Then it will display each epoch of weights updates and train test errors. In addition, you could also refer to output.ipynb for the output figure under 'Perceptron' folder if do not have enough time to run.
