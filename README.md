@@ -21,4 +21,4 @@ This time you need to select which percetron algorithm you would like to try. Af
 
 5. For SVM:
 excute the code with run.sh, (if not working please just try 'python main.py', then the code will excecute)
-This time you need to select which SVM algorithm you would like to try. After exeuction, it will prompt you input 'Algorithm? 0 for Primal SVM, 1 for Dual SVM, 2 for Gaussian Kernel', then just input 0 or 1 or 2 for algorithm specification. Then it will display each epoch of weights updates and train test errors. In addition, you could also refer to output.ipynb for the output figure under 'SVM' folder if do not have enough time to run.
+This time you need to select which SVM algorithm you would like to try. After exeuction, it will prompt you input 'Algorithm? 0 for Primal SVM, 1 for Dual SVM, 2 for Gaussian Kernel', then just input 0 or 1 or 2 for algorithm specification. Then it will display each epoch of weights updates and train test errors. 
