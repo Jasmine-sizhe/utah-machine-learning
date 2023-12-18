@@ -3,6 +3,9 @@ import pandas as pd
 import numpy as np
 from sklearn.impute import SimpleImputer
 from sklearn.preprocessing import StandardScaler
+from sklearn.metrics import roc_auc_score, accuracy_score, hamming_loss, f1_score
+import torch
+
 
 #Derive fl_status column based on fl_echo and FLI(when available): 1 for positive; 0 for negative; -1 for unavailable
 def derive_fl_status(row):
@@ -307,3 +310,44 @@ def preprocess_features_and_target(df):
     X_combined = pd.concat([X_numeric_scaled_imputed, X_categorical_encoded], axis=1)
 
     return X_combined, y
+
+def calculate_performance_AEclassifier(val_loader, model):
+    model.eval()
+    all_labels = []
+    all_predictions = []
+
+    with torch.no_grad():
+        for inputs, labels in val_loader:
+            outputs = model(inputs)
+            # print(outputs)
+            # break  #check for one batch
+            predicted = outputs[1].data
+            all_labels.append(labels.numpy())
+            all_predictions.append(predicted.numpy())
+
+    all_labels = np.vstack(all_labels)
+    all_predictions = np.vstack(all_predictions)
+
+    accuracy = accuracy_score(all_labels, all_predictions > 0.5)
+    f1_micro = f1_score(all_labels, all_predictions > 0.5, average='micro')
+    f1_macro = f1_score(all_labels, all_predictions > 0.5, average='macro')
+    hl = hamming_loss(all_labels, all_predictions > 0.5)
+
+    auc_micro = roc_auc_score(all_labels, all_predictions, average='micro')
+    auc_macro = roc_auc_score(all_labels, all_predictions, average='macro')
+
+    print(f'Accuracy: {accuracy * 100:.2f}%')
+    print(f'F1 Score (Micro): {f1_micro:.4f}')
+    print(f'F1 Score (Macro): {f1_macro:.4f}')
+    print(f'Hamming Loss: {hl:.4f}')
+    print(f'AUC (Micro): {auc_micro:.4f}')
+    print(f'AUC (Macro): {auc_macro:.4f}')
+
+    auc_scores = roc_auc_score(all_labels, all_predictions, average=None)
+    targets = ['t2_MAFLD_0', 't2_MAFLD_Obesity', 't2_MAFLD_Diabetes', 't2_MAFLD_MD']
+
+    for i, target in enumerate(targets):
+        auc = auc_scores[i]
+        print(f'AUC for {target}: {auc:.4f}')
+
+    return accuracy, f1_micro, f1_macro, hl, auc_micro, auc_macro, auc_scores
